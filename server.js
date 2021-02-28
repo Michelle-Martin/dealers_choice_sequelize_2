@@ -66,7 +66,8 @@ const html = `
 
 app.get('/api/genres', async(req,res,next)=> {
     try {
-        response = (await Genre.findAll()).data
+        // response = (await Genre.findAll()).data
+        const response = await Genre.findAll({})
         res.send(`
 <html> 
 <head>
@@ -75,18 +76,16 @@ app.get('/api/genres', async(req,res,next)=> {
 </head>
 <body>
 <h1> What to Watch on Netflix Now! </h1>
+
+<h2> Movies by Genre </h2>
 <h2> ${response.map (genre=> `
 <li>
-<a href='/movies/${genre.id}'> ${genre.name} 
+<a href='/genres/${genre.id}'> ${genre.name} 
 </li>`).join('')} </h2> 
-<ul> 
-
-<li>
-</li>
 </body>
 </html>
 `
-        )
+        )  
     }
 
     catch(ex){
@@ -94,9 +93,14 @@ app.get('/api/genres', async(req,res,next)=> {
     }
 })
 
-app.get('/api/genres/movies', async(req,res,next)=> {
+
+app.get('/api/genres/:id', async(req,res,next)=> {
+    const {id} = req.params.id
     try {
-        res.send(await Movie.findAll({
+        res.send(await Movie.findAll({ where:{ 
+            include: [{ genreId: id}]
+       
+        }
 
         }));
     }
